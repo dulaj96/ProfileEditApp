@@ -6,8 +6,9 @@ import {
   ImageBackground,
   TextInput,
   Button,
+  Animated,
 } from 'react-native';
-import React, {useCallback, useMemo, useRef} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 
 import {BottomSheetModal, BottomSheetModalProvider} from '@gorhom/bottom-sheet';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -18,22 +19,58 @@ import Feather from 'react-native-vector-icons/Feather';
 
 import {useTheme} from 'react-native-paper';
 
+import ImagePicker from 'react-native-image-crop-picker';
+
+import profilePhoto from '../../assets/mithun.jpg';                 //Initial Profile Photo
+
 const EditProfile = () => {
+
   const {colors} = useTheme(); //Dark Theme
 
   const bottomSheetModalRef = useRef(null);
   const snapPoints = useMemo(() => ['25%', '42%'], []);
-  const handlePresentModalPress = useCallback(() => {
+  const handlePresentModalPress = useCallback(() => {                 //To open bottom screen
     bottomSheetModalRef.current?.present();
+  }, []);
+  const handleClosePress = useCallback(() => {                        //To close bottom sheet
+    bottomSheetModalRef.current?.close();
   }, []);
   const handleSheetChanges = useCallback(index => {
     console.log('handleSheetChanges', index);
   }, []);
 
+  const [fall] = useState(new Animated.Value(1));                             //To Blur Screen
+
+  const takePhotoFromCamera = () => {                               //To Take a Photo  
+    ImagePicker.openCamera({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then(image => {
+      console.log(image);
+      setProfile(image.path);
+    });
+  }
+  const choosePhotoFromLibrary = () => {                          //To Choose From Gallery
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true
+    }).then(image => {
+      console.log(image);
+      setProfile(image.path);
+    });
+  }
+
+  const [profile, setProfile] = useState(null);
+
   return (
     <GestureHandlerRootView style={{height: '100%'}}>
       <View style={styles.container}>
-        <View style={{margin: 20}}>
+        <Animated.View style={{
+            margin: 20,
+            // opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)),
+            }}>
           <View style={{alignItems: 'center'}}>
             <TouchableOpacity onPress={handlePresentModalPress}>
               <View
@@ -45,7 +82,7 @@ const EditProfile = () => {
                   alignItems: 'center',
                 }}>
                 <ImageBackground
-                  source={require('../../assets/mithun.jpg')}
+                  source={profile ? {uri:profile} : profilePhoto}
                   style={{height: 100, width: 100}}
                   imageStyle={{borderRadius: 15}}>
                   <View
@@ -143,7 +180,7 @@ const EditProfile = () => {
           <TouchableOpacity style={styles.commandButton} onPress={() => {}}>
             <Text style={styles.commandButtonTitle}>Submit</Text>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         <BottomSheetModalProvider>
           <BottomSheetModal
@@ -160,13 +197,13 @@ const EditProfile = () => {
                   Choose Your Profile Picture
                 </Text>
               </View>
-              <TouchableOpacity style={styles.panelButton}>
+              <TouchableOpacity style={styles.panelButton} onPress={takePhotoFromCamera}>
                 <Text style={styles.panelButtonTitle}>Take Photo</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.panelButton}>
+              <TouchableOpacity style={styles.panelButton} onPress={choosePhotoFromLibrary}>
                 <Text style={styles.panelButtonTitle}>Choose From Library</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.panelButton} onPress={() => {}}>
+              <TouchableOpacity style={styles.panelButton} onPress={handleClosePress}>
                 <Text style={styles.panelButtonTitle}>Cancel</Text>
               </TouchableOpacity>
             </View>
