@@ -21,27 +21,31 @@ import {useTheme} from 'react-native-paper';
 
 import ImagePicker from 'react-native-image-crop-picker';
 
-import profilePhoto from '../../assets/mithun.jpg';                 //Initial Profile Photo
+import profilePhoto from '../../assets/mithun.jpg'; //Initial Profile Photo
+
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const EditProfile = () => {
-
   const {colors} = useTheme(); //Dark Theme
 
   const bottomSheetModalRef = useRef(null);
   const snapPoints = useMemo(() => ['25%', '42%'], []);
-  const handlePresentModalPress = useCallback(() => {                 //To open bottom screen
+  const handlePresentModalPress = useCallback(() => {
+    //To open bottom screen
     bottomSheetModalRef.current?.present();
   }, []);
-  const handleClosePress = useCallback(() => {                        //To close bottom sheet
+  const handleClosePress = useCallback(() => {
+    //To close bottom sheet
     bottomSheetModalRef.current?.close();
   }, []);
   const handleSheetChanges = useCallback(index => {
     console.log('handleSheetChanges', index);
   }, []);
 
-  const [fall] = useState(new Animated.Value(1));                             //To Blur Screen
+  // let fall = new Animated.Value(1);                             //To Blur Screen
 
-  const takePhotoFromCamera = () => {                               //To Take a Photo  
+  const takePhotoFromCamera = () => {
+    //To Take a Photo
     ImagePicker.openCamera({
       width: 300,
       height: 400,
@@ -50,27 +54,36 @@ const EditProfile = () => {
       console.log(image);
       setProfile(image.path);
     });
-  }
-  const choosePhotoFromLibrary = () => {                          //To Choose From Gallery
+  };
+  const choosePhotoFromLibrary = () => {
+    //To Choose From Gallery
     ImagePicker.openPicker({
       width: 300,
       height: 400,
-      cropping: true
+      cropping: true,
     }).then(image => {
       console.log(image);
       setProfile(image.path);
     });
-  }
+  };
 
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(null); //Change Profile Photo
+
+  const navigation = useNavigation(); //Update Profile Details
+  const route = useRoute();
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [number, setNumber] = useState('');
+  const [email, setEmail] = useState('');
 
   return (
     <GestureHandlerRootView style={{height: '100%'}}>
       <View style={styles.container}>
-        <Animated.View style={{
+        <Animated.View
+          style={{
             margin: 20,
             // opacity: Animated.add(0.1, Animated.multiply(fall, 1.0)),
-            }}>
+          }}>
           <View style={{alignItems: 'center'}}>
             <TouchableOpacity onPress={handlePresentModalPress}>
               <View
@@ -82,7 +95,7 @@ const EditProfile = () => {
                   alignItems: 'center',
                 }}>
                 <ImageBackground
-                  source={profile ? {uri:profile} : profilePhoto}
+                  source={profile ? {uri: profile} : profilePhoto} //Change Photo
                   style={{height: 100, width: 100}}
                   imageStyle={{borderRadius: 15}}>
                   <View
@@ -125,15 +138,23 @@ const EditProfile = () => {
               placeholderTextColor="#666666"
               autoCorrect={false}
               style={[styles.textInput, {color: colors.text}]}
+              value={name}
+              onChange={setName}
             />
           </View>
           <View style={styles.action}>
-            <FontAwesome name="user-o" color={colors.text} size={20} />
+            <MaterialCommunityIcons
+              name="map-marker-radius"
+              color="#777777"
+              size={20}
+            />
             <TextInput
-              placeholder="Last Name"
+              placeholder="Addres"
               placeholderTextColor="#666666"
               autoCorrect={false}
               style={[styles.textInput, {color: colors.text}]}
+              value={address}
+              onChange={setAddress}
             />
           </View>
           <View style={styles.action}>
@@ -144,6 +165,8 @@ const EditProfile = () => {
               keyboardType="number-pad"
               autoCorrect={false}
               style={[styles.textInput, {color: colors.text}]}
+              value={number}
+              onChange={setNumber}
             />
           </View>
           <View style={styles.action}>
@@ -153,6 +176,8 @@ const EditProfile = () => {
               placeholderTextColor="#666666"
               autoCorrect={false}
               style={[styles.textInput, {color: colors.text}]}
+              value={email}
+              onChange={setEmail}
             />
           </View>
           <View style={styles.action}>
@@ -177,7 +202,21 @@ const EditProfile = () => {
               style={[styles.textInput, {color: colors.text}]}
             />
           </View>
-          <TouchableOpacity style={styles.commandButton} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.commandButton}
+            onPress={() =>
+              navigation.navigate('Home', {
+                params: {
+                  details: {
+                    name: name,
+                    address: address,
+                    number: number,
+                    email: email,
+                  },
+                },
+                merge: true,
+              })
+            }>
             <Text style={styles.commandButtonTitle}>Submit</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -189,6 +228,7 @@ const EditProfile = () => {
             snapPoints={snapPoints}
             onChange={handleSheetChanges}
             backgroundStyle={{borderRadius: 30}}
+            // useCallback={fall}
           >
             <View style={styles.panel}>
               <View style={{alignItems: 'center'}}>
@@ -197,13 +237,19 @@ const EditProfile = () => {
                   Choose Your Profile Picture
                 </Text>
               </View>
-              <TouchableOpacity style={styles.panelButton} onPress={takePhotoFromCamera}>
+              <TouchableOpacity
+                style={styles.panelButton}
+                onPress={takePhotoFromCamera}>
                 <Text style={styles.panelButtonTitle}>Take Photo</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.panelButton} onPress={choosePhotoFromLibrary}>
+              <TouchableOpacity
+                style={styles.panelButton}
+                onPress={choosePhotoFromLibrary}>
                 <Text style={styles.panelButtonTitle}>Choose From Library</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.panelButton} onPress={handleClosePress}>
+              <TouchableOpacity
+                style={styles.panelButton}
+                onPress={handleClosePress}>
                 <Text style={styles.panelButtonTitle}>Cancel</Text>
               </TouchableOpacity>
             </View>

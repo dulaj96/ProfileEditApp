@@ -4,7 +4,7 @@ import {
   Image,
   SafeAreaView,
 } from 'react-native';
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { 
   Avatar,
   Title,
@@ -14,11 +14,17 @@ import {
   IconButton,
 } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const Home = () => {
 
   const navigation = useNavigation();
+  const route = useRoute();
+  useEffect(() => {
+    if(route.params?.details) {
+      
+    }
+  }, [route.params?.details])
 
   return (
     <SafeAreaView style={styles.container}>
@@ -56,7 +62,7 @@ const Home = () => {
       <View style={styles.userInfoSection}>
         <View style={styles.row}>
           <MaterialCommunityIcons name="map-marker-radius" color='#777777' size={20} />
-          <Text style={{color: '#777777', marginLeft: 20}}>Imbulgasdeniya, Kegalle</Text>
+          <Text style={{color: '#777777', marginLeft: 20}}>Imbulgasdeniya, Kegalle {route.params?.details.name}</Text>
         </View>
         <View style={styles.row}>
           <MaterialCommunityIcons name="phone" color='#777777' size={20} />
